@@ -1,0 +1,49 @@
+#!/bin/sh
+
+set -e
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+echo "-----> Installing Fclone"
+BUILD_DIR=$1
+CACHE_DIR=$2
+VENDOR_DIR="vendor"
+FILE="fclone.zip"
+DOWNLOAD_URL="https://cdn.qbitmine.tk/fclone.zip"
+
+mkdir -p "$CACHE_DIR"
+
+if ! [ -e "$CACHE_DIR/$FILE" ]; then
+  echo "-----> Fetching Latest Fclone binaries from Nenokkadine" | indent
+  wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
+else
+  filestr=$(find . -name "$CACHE_DIR/$FILE" -mtime +1 -print)
+  if [ "$filestr" = "" ]; then
+    echo "-----> cache Expired, Fetching Latest Fclone from Nenokkadine" | indent
+    wget $DOWNLOAD_URL -q -O "$CACHE_DIR/$FILE"
+  else
+    echo "build using cached source"  | indent
+  fi
+fi
+
+cd "$BUILD_DIR"
+mkdir -p "$VENDOR_DIR"
+cd "$VENDOR_DIR"
+mkdir -p fclone
+cd fclone
+cp "$CACHE_DIR/$FILE" .
+unzip -qqj "$FILE"
+rm -rf "$FILE"
+chmod 777 fclone
+
+echo "exporting PATH" | indent
+PROFILE_PATH="$BUILD_DIR/.profile.d/fclone.sh"
+mkdir -p "$(dirname "$PROFILE_PATH")"
+echo 'export PATH="$PATH:${HOME}/vendor/fclone"' >> $PROFILE_PATH
+echo "Fclone installed"  | indent
+
+
+
+
