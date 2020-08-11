@@ -1,5 +1,5 @@
 #!/bin/sh
 
 # this pack is valid for all apps
-echo "Fclone Has Been Installed Sucessfully"
+echo "Fclone"
 exit 0
